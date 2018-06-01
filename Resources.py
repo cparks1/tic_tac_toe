@@ -11,3 +11,4 @@ class Sprites:
         self.naught = pygame.image.load('resources/naught.png')
         self.draught = pygame.image.load('resources/draught.png')
         self.empty = pygame.image.load('resources/empty.png')
+        self.cell = pygame.image.load('resources/cell.png')

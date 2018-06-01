@@ -18,7 +18,7 @@ class InvalidPlayersException(Exception):
 class TicTacToeBoard:
     resources = Resources()
 
-    def __init__(self, screen, size=3):
+    def __init__(self, screen=None, size=3):
         self.__board = [[BoardPiece.EMPTY for x in range(size)] for y in range(size)]  # size X size board (NxN)
         self.__players = list()
         self.__turn = BoardPiece.EMPTY  # No turns may be taken until the 2 players have joined
@@ -32,22 +32,32 @@ class TicTacToeBoard:
     def board(self):
         return self.__board
 
-    def draw_board(self):
-        x, y = 0, 0
+    @property
+    def text_board(self):
+        text_list = [['X' if piece is BoardPiece.DRAUGHT else 'O' if piece is BoardPiece.NAUGHT else '_' for piece in row] for row in self.__board]
+        return '\r'.join([''.join(row) for row in text_list])
 
-        self.__screen.fill((255, 255, 255))  # Fill the screen white
+    def draw_board(self):
+        cell_resource = TicTacToeBoard.resources.sprites.cell
+
+        cell_x, cell_y = 0, 0
+
+        if self.__screen:
+            self.__screen.fill((255, 255, 255))  # Fill the screen white
 
         for row in self.__board:
-            chosen_resource = None
-            x = 0
+            cell_x = 0
             for piece in row:
-                chosen_resource = TicTacToeBoard.resources.sprites.draught if piece is BoardPiece.DRAUGHT \
+                piece_resource = TicTacToeBoard.resources.sprites.draught if piece is BoardPiece.DRAUGHT \
                     else TicTacToeBoard.resources.sprites.naught if piece is BoardPiece.NAUGHT else \
                     TicTacToeBoard.resources.sprites.empty
 
-                self.__screen.blit(chosen_resource, (x, y))  # Draw the piece
-                x += chosen_resource.get_size()[1]  # Increment the next draw column
-            y += chosen_resource.get_size()[0]  # Increment the next draw row
+                if self.__screen:
+                    self.__screen.blit(cell_resource, (cell_x, cell_y))  # Draw the cell
+                    self.__screen.blit(piece_resource, (cell_x + 10, cell_y + 10))  # Draw the piece
+
+                cell_x += cell_resource.get_size()[1]  # Increment the next cell draw column
+            cell_y += cell_resource.get_size()[0]  # Increment the next cell draw row
 
         pygame.display.update()
 
@@ -115,6 +125,15 @@ class TicTacToeBoard:
 
         return False
 
+    def get_winner(self):
+        winning_areas = self.get_winning_areas()
+        for winning_area in winning_areas:
+            # If the list is full of one element and isn't an empty space
+            if winning_area[0] is not BoardPiece.EMPTY and winning_area.count(winning_area[0]) == len(winning_area):
+                return winning_area[0]  # Return the piece type that won
+
+        return BoardPiece.EMPTY  # Tie (or error)
+
     def player_make_move(self, x, y, player):
         if self.is_valid_move(x, y, player) and \
                 self.is_finished() is False:
@@ -137,7 +156,8 @@ class TicTacToeBoard:
             self.player_make_move(coord[0], coord[1], player)
 
     def reset_game(self):
-        self.__screen.fill((255, 255, 255))
+        if self.__screen:
+            self.__screen.fill((255, 255, 255))
         self.init_board()
         self.draw_board()
 

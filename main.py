@@ -1,10 +1,10 @@
 import pygame
-from TicTacToeBoard import TicTacToeBoard
+from TicTacToeBoard import TicTacToeBoard, BoardPiece
 
 
 def main():
     board_size = 3
-    game_board_size = (board_size*32, board_size*32)
+    game_board_size = (board_size*50, board_size*50)
 
     pygame.init()  # Initialize the pygame module
 
@@ -14,9 +14,11 @@ def main():
 
     clock = pygame.time.Clock()
 
-    board = TicTacToeBoard(screen, size=board_size)
+    #board = TicTacToeBoard(screen, size=board_size)
+    board = TicTacToeBoard(size=board_size)
 
     running = True  # Variable used to control the main loop
+    game_count = 0  # Counts the number of games played
     while running:  # Main loop
         for event in pygame.event.get():  # Event handling (Gets all events from the event queue)
             if event.type == pygame.QUIT:  # Quitting? Run tear down, break run loop.
@@ -27,10 +29,17 @@ def main():
             for player, _ in players:
                 if board.turn == player.piece:
                     board.player_move_random(player)
+                    #clock.tick(2)
 
+        game_count += 1
+        winner = board.get_winner()
+        if winner is BoardPiece.EMPTY:
+            print("Game %d: Tie!" % game_count)
+        else:
+            print("Game %d: %s won!" % (game_count, "DRAUGHT" if winner is BoardPiece.DRAUGHT else "NAUGHT"))
 
         pygame.display.update()
-        clock.tick(2)
+        #clock.tick(2)
         board.reset_game()
 
 
