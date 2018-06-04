@@ -1,0 +1,2 @@
+class InvalidCellSize(Exception):
+    pass

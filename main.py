@@ -14,8 +14,8 @@ def main():
 
     clock = pygame.time.Clock()
 
-    #board = TicTacToeBoard(screen, size=board_size)
-    board = TicTacToeBoard(size=board_size)
+    board = TicTacToeBoard(screen, size=board_size)
+    #board = TicTacToeBoard(size=board_size)
 
     running = True  # Variable used to control the main loop
     game_count = 0  # Counts the number of games played
@@ -29,17 +29,18 @@ def main():
             for player, _ in players:
                 if board.turn == player.piece:
                     board.player_move_random(player)
-                    #clock.tick(2)
+                    clock.tick(4)
 
         game_count += 1
         winner = board.get_winner()
         if winner is BoardPiece.EMPTY:
             print("Game %d: Tie!" % game_count)
         else:
+            board.draw_win()
             print("Game %d: %s won!" % (game_count, "DRAUGHT" if winner is BoardPiece.DRAUGHT else "NAUGHT"))
 
         pygame.display.update()
-        #clock.tick(2)
+        clock.tick(3)
         board.reset_game()
 
 
